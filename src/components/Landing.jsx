@@ -1,0 +1,16 @@
+function Landing() {
+
+  return (
+    <>
+      <div className="landing-container">
+        <h2 className="chat-label"> Start Chatting </h2>
+        <div className="chat-btns">
+          <button type="button">Text</button>
+          <button>Video</button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+export default Landing
