@@ -13,10 +13,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
+div#root {
+  height: 100%;
+}
+
+html, body {
   margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+  height: 100%;
 }
 
 /* Navbar */
@@ -32,6 +35,10 @@ nav {
 nav img {
   width: 70px;
   height: 70px;
+}
+
+nav a {
+  cursor: pointer;
 }
 
 .title {
@@ -69,8 +76,68 @@ nav img {
   width: 120px;
   padding: 15px 20px;
   background-color: #fb8b24;
+  border-color: #fb8b24;;
   color: white;
   border: 0;
-  border-radius: 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.chat-btns button:active {
+  background-color: #e36414;
+}
+
+/* Text Chat */
+.text-chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+  padding: 10px;
+}
+
+.text-log {
+  display: block;
+  height: 80%;
+  flex-grow: 1;
+  overflow: scroll;
+  padding: 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+}
+
+.text-chat-actions {
+  display: flex;
+  margin-top: 10px;
+  gap: 5px;
+}
+
+.text-chat-actions textarea {
+  flex-grow: 1;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, sans-serif;
+  font-size: 18px;
+  border: 1px solid #d9d9d9;
+  padding: 5px;
+  border-radius: 5px;
+  overflow-x: hidden;
+}
+
+.send-btn {
+  color: white;
+  background-color: #fb8b24;
+  border: 0;
+  width: 100px;
+  border-radius: 10px;
+}
+
+.send-btn:active {
+  background-color: #e36414;
+}
+
+.next-btn {
+  background-color: white;
+  border: 1px solid #d9d9d9;
+  width: 100px;
+  border-radius: 10px;
 }
 
