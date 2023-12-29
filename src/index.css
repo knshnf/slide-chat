@@ -92,8 +92,9 @@ nav a {
 .text-chat-container {
   display: flex;
   flex-direction: column;
-  height: 80%;
+  height: calc(100% - 95px);
   padding: 10px;
+  flex-grow: 1;
 }
 
 .text-log {
@@ -141,3 +142,31 @@ nav a {
   border-radius: 10px;
 }
 
+/* Video Chat */
+.video-chat-container {
+  display: flex;
+  flex-direction: row;
+  height: calc(100% - 95px);
+}
+
+.media-container {
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  padding-left: 10px;
+  gap: 10px;
+  min-width: 39%;
+}
+
+.media {
+  display: block;
+  height: 300px;
+  aspect-ratio: 3/2;
+  border: 1px solid #d9d9d9;
+  align-content: center;
+  border-radius: 5px;
+}
+
+.video-chat-container .text-chat-container {
+  height: 100%;
+}
