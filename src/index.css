@@ -105,6 +105,12 @@ nav a {
   padding: 10px;
   border: 1px solid #d9d9d9;
   border-radius: 5px;
+  padding-top: 0px;
+}
+
+.text-log p {
+  padding-top: 0px;
+  line-height: normal;
 }
 
 .text-chat-actions {
@@ -141,6 +147,24 @@ nav a {
   border: 1px solid #d9d9d9;
   width: 100px;
   border-radius: 10px;
+}
+
+.chat-stranger {
+  color: black;       
+ }
+
+ .chat-you {
+  color: black;       
+ }
+
+.chat-stranger:before {
+  content: "Stranger: ";
+  color: red;
+}
+
+.chat-you:before {
+  content: "You: ";
+  color: blue;
 }
 
 /* Video Chat */
