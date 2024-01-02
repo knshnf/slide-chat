@@ -26,8 +26,8 @@ function send(wsClient, type, body) {
 function clearClient(wss, socket) {
     // clear all client
     // channels = {}
-    Object.keys(channels || {}).forEach((cname) => {
-        Object.keys(channels[cname] || {}).forEach((uid) => {
+    Object.keys(channels).forEach((cname) => {
+        Object.keys(channels[cname]).forEach((uid) => {
             if (channels[cname][uid] === socket) {
                 delete channels[cname][uid]
             }
@@ -53,7 +53,7 @@ function onMessage(wss, socket, message) {
                 channels[channelName] = {}
                 channels[channelName][userId] = socket
             }
-            const userIds = Object.keys(channels[channelName] || {})
+            const userIds = Object.keys(channels[channelName])
             send(socket, 'joined', userIds)
             break;
         }
@@ -61,7 +61,7 @@ function onMessage(wss, socket, message) {
             // quit channel
             if (channels[channelName]) {
                 channels[channelName][userId] = null
-                const userIds = Object.keys(channels[channelName] || {})
+                const userIds = Object.keys(channels[channelName])
                 if (userIds.length === 0) {
                     delete channels[channelName]
                 }
@@ -71,7 +71,7 @@ function onMessage(wss, socket, message) {
         case 'send_offer': { 
             // exchange sdp to peer 
             const sdp = body.sdp
-            let userIds = Object.keys(channels[channelName] || {})
+            let userIds = Object.keys(channels[channelName])
             userIds.forEach(id => {
                 if (userId.toString() !== id.toString()) {
                     const wsClient = channels[channelName][id]
@@ -83,7 +83,7 @@ function onMessage(wss, socket, message) {
         case 'send_answer': { 
             // exchange sdp to peer 
             const sdp = body.sdp
-            let userIds = Object.keys(channels[channelName] || {})
+            let userIds = Object.keys(channels[channelName])
             userIds.forEach(id => {
                 if (userId.toString() !== id.toString()) {
                     const wsClient = channels[channelName][id]
@@ -94,7 +94,7 @@ function onMessage(wss, socket, message) {
         }
         case 'send_ice_candidate': {
             const candidate = body.candidate
-            let userIds = Object.keys(channels[channelName] || {})
+            let userIds = Object.keys(channels[channelName])
             userIds.forEach(id => {
                 if (userId.toString() !== id.toString()) {
                     const wsClient = channels[channelName][id]

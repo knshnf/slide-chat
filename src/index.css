@@ -88,6 +88,12 @@ nav a {
   background-color: #e36414;
 }
 
+.chat-container {
+  display: flex;
+  flex-direction: row;
+  height: calc(100% - 95px);
+}
+
 /* Text Chat */
 .text-chat-container {
   display: flex;
@@ -95,6 +101,7 @@ nav a {
   height: calc(100% - 95px);
   padding: 10px;
   flex-grow: 1;
+  
 }
 
 .text-log {
@@ -168,13 +175,8 @@ nav a {
 }
 
 /* Video Chat */
-.video-chat-container {
-  display: flex;
-  flex-direction: row;
-  height: calc(100% - 95px);
-}
 
-.video-chat-container .text-chat-container {
+.chat-container .text-chat-container {
   height: 100%;
 }
 
@@ -201,5 +203,4 @@ nav a {
 .videoPlayer {
   width: 100%;
   height: 100%;
-  
 }
