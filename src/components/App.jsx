@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 
 let localStream;
-let remoteSream;
+let remoteStream;
 let localPeerConnection;
 let sendChannel;
 let receiveChannel;
@@ -38,9 +38,9 @@ function App() {
 
   const [startChat, setStartChat] = useState("none");
 
-  const handleStartChat = (data) => {
+  const handleStartChat = async (data) => {
     setStartChat(data);
-    setupDevice();
+    await setupDevice();
     join();
     callOnClick();
   }
@@ -61,7 +61,6 @@ function App() {
     // wsClient.onclose = () => console.log('ws closed');
 
     
-
   }, []);
 
 
@@ -113,16 +112,25 @@ function App() {
     }
   };
 
-  const setupDevice = () => {
-    console.log('setupDevice invoked');
-    navigator.getUserMedia({ audio: true, video: true }, (stream) => {
-      // render local stream on DOM
-      const localPlayer = document.getElementById('localPlayer');
-      localPlayer.srcObject = stream;
-      localStream = stream;
-    }, (error) => {
-      console.error('getUserMedia error:', error);
-    });
+  const setupDevice = async () => {
+
+    return new Promise((resolve, reject) => {
+      console.log('setupDevice invoked');
+      navigator.getUserMedia({ audio: true, video: true }, (stream) => {
+        // render local stream on DOM
+        const localPlayer = document.getElementById('local-player');
+        localPlayer.srcObject = stream;
+        
+        localStream = stream;
+        console.log('assigned value to localStream', localStream);
+        resolve();
+      }, (error) => {
+        console.error('getUserMedia error:', error);
+        reject();
+      });
+    })
+    
+
   };
 
   const join = () => {
@@ -157,6 +165,9 @@ function App() {
     setCallButtonDisabled(true);
     setHangupButtonDisabled(false);
 
+    console.log('localstream on callonclick', localStream);
+
+
     if (localStream && localStream.getVideoTracks().length > 0) {
       console.log(`Using video device: ${localStream.getVideoTracks()[0].label}`);
     }
@@ -174,11 +185,7 @@ function App() {
 
     // Handler for add stream
     console.log('setup gotRemoteStream');
-    localPeerConnection.onaddstream = (event) => {
-      console.log('gotRemoteStream invoked');
-      const remotePlayer = document.getElementById('peerPlayer');
-      remotePlayer.srcObject = event.stream;
-    };
+    localPeerConnection.onaddstream = gotRemoteStream;
 
     // Create data channel
     createDataChannel();
@@ -284,8 +291,9 @@ const gotLocalDescription = (offer) => {
 
   const gotRemoteStream = (event) => {
     console.log('gotRemoteStream invoked');
-    const remotePlayer = document.getElementById('peerPlayer');
+    const remotePlayer = document.getElementById('peer-player');
     remotePlayer.srcObject = event.stream;
+    remoteStream = event.stream;
   };
 
   const gotLocalIceCandidateOffer = (event) => {
