@@ -39,13 +39,6 @@ function App() {
 
   const [startChat, setStartChat] = useState("none");
 
-  const handleStartChat = async (data) => {
-    setStartChat(data);
-    await setupDevice();
-    join();
-    callOnClick();
-  }
-
   // Reference for web socket
   const ws = useRef(null);
 
@@ -60,11 +53,7 @@ function App() {
     // };
 
     // wsClient.onclose = () => console.log('ws closed');
-
-    
   }, []);
-
-
 
   // Receive messages from the web socket server
   useEffect(() => {
@@ -103,20 +92,38 @@ function App() {
     };
   }, [channelName, userId]);
 
-// Send message to the web socket server
-  const sendWsMessage = (type, body) => {
-    console.log('sendWsMessage invoked', type, body);
 
-    if(ws.current) {
-      ws.current.send(JSON.stringify({
-        type,
-        body,
-      }));
-    }
-  };
+  const handleStartChat = async (data) => {
+    setStartChat(data);
+  }
+
+  const handleStartTextChat = () => {
+    console.log('handleStartTextChat invoked');
+    setStartChat("text chat");
+    join();
+    callOnClick();
+  }
+
+  const handleStartVideoChat = async () => {
+    setStartChat("video chat");
+    await setupDevice();
+    join();
+    callOnClick();
+  }
+
+  // Send message to the web socket server
+    const sendWsMessage = (type, body) => {
+      console.log('sendWsMessage invoked', type, body);
+
+      if(ws.current) {
+        ws.current.send(JSON.stringify({
+          type,
+          body,
+        }));
+      }
+    };
 
   const setupDevice = async () => {
-
     return new Promise((resolve, reject) => {
       console.log('setupDevice invoked');
       navigator.getUserMedia({ audio: true, video: true }, (stream) => {
@@ -132,14 +139,10 @@ function App() {
         reject();
       });
     })
-    
-
   };
 
   const join = () => {
     console.log('join invoked');
-
-    
     let interests = [''];
 
     setJoinButtonDisabled(true);
@@ -386,14 +389,19 @@ const gotLocalDescription = (offer) => {
     // setSendMessage('');
   };
 
-  // if(startChat == "video chat") {
-  //   setupDevice();
-  // }
+  const handleCloseChat = () => {
+    localStream.getTracks().forEach(function(track) {
+      track.stop();
+    });
+
+    // TODO: Close Connections
+    
+  }
 
   return (
     <>
-      <Navbar handleStartChat={handleStartChat}/>
-      {startChat == "none" && <Landing handleStartChat={handleStartChat}/>}
+      <Navbar handleStartChat={handleStartChat} handleCloseChat={handleCloseChat}/>
+      {startChat == "none" && <Landing handleStartTextChat={handleStartTextChat} handleStartVideoChat={handleStartVideoChat}/>}
 
       <div className="chat-container">
         {startChat == "video chat" && <VideoChat/>}
