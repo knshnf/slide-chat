@@ -135,7 +135,10 @@ nav a {
   border-radius: 5px;
   overflow-x: hidden;
   resize: none;
+  
+  outline: none;
 }
+
 
 .send-btn {
   color: white;
@@ -149,11 +152,32 @@ nav a {
   background-color: #e36414;
 }
 
-.next-btn {
+.stop-btn {
   background-color: white;
-  border: 1px solid #d9d9d9;
+  border: 1px solid hsl(0, 0%, 85%);
   width: 100px;
   border-radius: 10px;
+}
+
+.confirm-btn {
+  background-color: #9b041c;
+  width: 100px;
+  border-radius: 10px;
+  color: white;
+  border: 0;
+}
+
+.next-btn {
+  background-color: #0f4c5c;
+  width: 100px;
+  border-radius: 10px;
+  color: white;
+  border: 0;
+}
+
+
+.text-chat-actions button {
+  white-space: normal;
 }
 
 .chat-stranger {
@@ -176,6 +200,10 @@ nav a {
 
 /* Video Chat */
 
+.video-chat-container {
+  width: 25%;
+}
+
 .chat-container .text-chat-container {
   height: 100%;
 }
@@ -186,7 +214,6 @@ nav a {
   padding-top: 10px;
   padding-left: 10px;
   gap: 10px;
-  min-width: 39%;
   justify-content: center;
 }
 
@@ -195,12 +222,12 @@ nav a {
   aspect-ratio: 4/3;
   align-content: center;
   background-color: black;
-  max-height: 50%;
+  height: 50%;
   border: 1px solid #d9d9d9;
   border-radius: 5px;
 }
 
-.videoPlayer {
+.video-player {
   width: 100%;
   height: 100%;
 }

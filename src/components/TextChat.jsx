@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function TextChat({sendChannel, receiveChannel}) {
-    const [log, setLog] = useState([])
-    const [chat, setChat] = useState("") 
+    const [log, setLog] = useState([]);
+    const [chat, setChat] = useState("");
+    const [showStopBtn, setShowStopBtn] = useState(true);
+    const [showConfirmBtn, setShowConfirmBtn] = useState(false);
+    const [showNextBtn, setShowNextBtn] = useState(false);
 
     // Event handler for receiving message
     if(receiveChannel instanceof RTCDataChannel) {
@@ -33,6 +36,36 @@ function TextChat({sendChannel, receiveChannel}) {
         setChat("");
     }
 
+    const handleStopBtn = () => {
+      setShowStopBtn(false); 
+      setShowConfirmBtn(true);
+    }
+
+    const handleConfirmBtn = () => {
+      setShowConfirmBtn(false);
+      setShowNextBtn(true);
+    }
+
+    const handleNextBtn = () => {
+      setShowNextBtn(false);
+      setShowStopBtn(true); 
+    }
+
+    const handleOnEnter = (e) => {
+      if(e.keyCode == 13 && e.shiftKey == false) {
+        e.preventDefault();
+        handleSend();
+      }
+    }
+
+    // const handleOnEsc = (e) => {
+    //   console.log('keyboard event invoked', buttonShown);
+    //   if(e.keyCode == 27 && e.shiftKey == false) {
+    //     console.log('esc pressed');
+        
+    //   }
+    // }
+
     return (
       <>
           <div className="text-chat-container">
@@ -44,8 +77,10 @@ function TextChat({sendChannel, receiveChannel}) {
                 )}
               </div>
               <div className="text-chat-actions"> 
-                <button className="next-btn"> Next </button>
-                <textarea value={chat} name="" id="" onChange={e => setChat(e.target.value)}></textarea>
+                {showStopBtn && <button className="stop-btn" onClick={handleStopBtn}> Stop <br /> (Esc)</button>}
+                {showConfirmBtn && <button className="confirm-btn" onClick={handleConfirmBtn}> Really? <br /> (Esc)</button>}
+                {showNextBtn && <button className="next-btn" onClick={handleNextBtn}> Next <br /> (Esc)</button>}
+                <textarea value={chat} name="" id="" onChange={e => setChat(e.target.value)} onKeyDown={handleOnEnter}></textarea>
                 <button className="send-btn" onClick={handleSend}> Send </button>
               </div>
           </div>
