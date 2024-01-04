@@ -1,5 +1,7 @@
 const debug = require('debug')(`slide:wss`);
 const WebSocket = require('ws');
+var cuid = require('cuid');
+
 let channels = {}
 
 function init (port) {
@@ -43,18 +45,34 @@ function onMessage(wss, socket, message) {
     const body = parsedMessage.body
     const channelName = body.channelName
     const userId = body.userId
+    const channelCuid = body.channelCuid
     
     switch (type) {
         case 'join': {
-            // join channel
-            if (channels[channelName]) {
-                channels[channelName][userId] = socket
+            const interests = body.interests
+
+            let channelCuid = findChannel(interests);
+            console.log('findchannel result', channelCuid)
+            if (channelCuid) {
+                console.log(channelCuid);
+                console.log( channels[channelCuid])
+                // channels[channelCuid] = {}
+                // channels[channelCuid]['users'] = {}
+                channels[channelCuid]['users'][userId] = socket;
+                // let newChannelInterests = matchInterests(interests, channel[interests]);
+                channels[channelCuid]['interests'] = interests;
             } else {
-                channels[channelName] = {}
-                channels[channelName][userId] = socket
+                channelCuid = cuid()
+                channels[channelCuid] = {}
+                channels[channelCuid]['users'] = {}
+                channels[channelCuid]['users'][userId] = socket;
+                channels[channelCuid]['interests'] = interests;
             }
-            const userIds = Object.keys(channels[channelName])
-            send(socket, 'joined', userIds)
+            // const userIds = Object.keys(channels[channelName])
+            console.log(channels);
+            const channelInfo = [channels[channelCuid]['interests'], channelCuid];
+            console.log('channelInfo sent');
+            send(socket, 'joined', channelInfo);
             break;
         }
         case 'quit': {
@@ -70,23 +88,26 @@ function onMessage(wss, socket, message) {
         }
         case 'send_offer': { 
             // exchange sdp to peer 
-            const sdp = body.sdp
-            let userIds = Object.keys(channels[channelName])
+            const sdp = body.sdp;
+            let userIds = Object.keys(channels[channelCuid]['users']);
+            console.log('userids to send offer', userIds);
             userIds.forEach(id => {
                 if (userId.toString() !== id.toString()) {
-                    const wsClient = channels[channelName][id]
+                    console.log('offer sent');
+                    const wsClient = channels[channelCuid]['users'][id]
                     send(wsClient, 'offer_sdp_received', sdp)
                 }
             })
             break;
         }
         case 'send_answer': { 
+            console.log('send_answer invoked');
             // exchange sdp to peer 
             const sdp = body.sdp
-            let userIds = Object.keys(channels[channelName])
+            let userIds = Object.keys(channels[channelCuid]['users']);
             userIds.forEach(id => {
                 if (userId.toString() !== id.toString()) {
-                    const wsClient = channels[channelName][id]
+                    const wsClient = channels[channelCuid]['users'][id]
                     send(wsClient, 'answer_sdp_received', sdp)
                 }
             })
@@ -94,10 +115,10 @@ function onMessage(wss, socket, message) {
         }
         case 'send_ice_candidate': {
             const candidate = body.candidate
-            let userIds = Object.keys(channels[channelName])
+            let userIds = Object.keys(channels[channelCuid]['users']);
             userIds.forEach(id => {
                 if (userId.toString() !== id.toString()) {
-                    const wsClient = channels[channelName][id]
+                    const wsClient = channels[channelCuid]['users'][id]
                     send(wsClient, 'ice_candidate_received', candidate)
                 }
             })
@@ -117,6 +138,55 @@ function onMessage(wss, socket, message) {
 function onClose(wss, socket, message) {
     debug('onClose', message);
     clearClient(wss, socket)
+}
+
+
+function matchInterests(arr1, arr2) {
+    console.log(arr1, arr2);
+   // converting into Set
+   const setA = new Set(arr1);
+   const setB = new Set(arr2);
+
+   let intersectionResult = [];
+
+   for (let i of setB) {
+   
+       if (setA.has(i)) {
+           intersectionResult.push(i);
+       }
+       
+   }
+   console.log('intersection', intersectionResult)
+   return intersectionResult;
+}
+
+// Non-null if match
+function findChannel(interests) {
+    // Get all channel cuids
+    let channelCuids = Object.keys(channels)
+
+    for(var i = 0; i < channelCuids.length; i++) {
+        let matchedInterests = matchInterests(interests, channels[channelCuids[i]]['interests']);
+        if (matchedInterests != []) {
+            return channelCuids[i];
+        }
+      }
+
+    return null;
+
+    // let channelCuid = channelCuids.forEach(channelCuid => {
+    //     let matchedInterests = matchInterests(interests, channels[channelCuid]['interests']);
+    //     console.log('matchedInterests', matchedInterests);
+    //     console.log(matchedInterests != [])
+    //     if (matchedInterests != []) {
+    //         return channelCuid;
+    //     }
+    //     else {
+    //         return null;
+    //     }
+    // });
+
+    // return channelCuid;
 }
 
 module.exports = {

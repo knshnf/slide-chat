@@ -10,6 +10,7 @@ let remoteStream;
 let localPeerConnection;
 let sendChannel;
 let receiveChannel;
+let channelCuid;
 
 const servers = { 'iceServers': [] };
 const URL_WEB_SOCKET = 'ws://localhost:8090/ws';
@@ -74,12 +75,14 @@ function App() {
         case 'joined':
           {
             const body = parsedMessage.body;
-            console.log('users in this channel', body);
+            channelCuid = body[1]
+            console.log('interests of this channel', body);
             break;
           }
         // Receive an offer
         case 'offer_sdp_received':
           {
+            console.log('offer_sdp_received');
             const offer = parsedMessage.body;
             onAnswer(offer);
             break;
@@ -136,24 +139,16 @@ function App() {
   const join = () => {
     console.log('join invoked');
 
-    if (!channelName) {
-      log.error('channelName is empty');
-      alert('channelName is empty');
-      return;
-    }
-
-    if (!userId) {
-      log.error('userId is empty');
-      alert('userId is empty');
-      return;
-    }
+    
+    let interests = [''];
 
     setJoinButtonDisabled(true);
     setCallButtonDisabled(false);
     // Join a channel
     sendWsMessage('join', {
-      channelName,
       userId,
+      channelName,
+      interests,
     });
   };
 
@@ -284,8 +279,9 @@ const gotLocalDescription = (offer) => {
     console.log('gotRemoteDescription invoked:', answer);
     console.log(typeof(localPeerConnection));
     if(localPeerConnection instanceof RTCPeerConnection) {
-      console.log('success set remote description');
+      
       localPeerConnection.setRemoteDescription(answer);
+      console.log('success set remote description');
     }
   };
 
@@ -315,7 +311,7 @@ const gotLocalDescription = (offer) => {
     if (!event.candidate) {
       const offer = localPeerConnection.localDescription;
       sendWsMessage('send_offer', {
-        channelName,
+        channelCuid,
         userId,
         sdp: offer,
       });
@@ -342,7 +338,7 @@ const gotLocalDescription = (offer) => {
     if (!event.candidate) {
       const answer = localPeerConnection.localDescription;
       sendWsMessage('send_answer', {
-        channelName,
+        channelCuid,
         userId,
         sdp: answer,
       });
