@@ -35,6 +35,8 @@ function App() {
   const [channelName, setChannelName] = useState('TEST');
   const [userId, setUserId] = useState(Math.floor(Math.random() * 1000000));
   const [renderLocalStream, setRenderLocalStream] = useState(false);
+  const [sendChannelState, setSendChannelState] = useState(false);
+  const [receiveChannelState, setReceiveChannelState] = useState(false);
   const [chatting, setChatting] = useState(false);
 
   const [startChat, setStartChat] = useState("none");
@@ -91,6 +93,15 @@ function App() {
       }
     };
   }, [channelName, userId]);
+
+  useEffect(() => {
+    if(sendChannelState && receiveChannelState) {
+      setChatting(true);
+    }
+    else {
+      setChatting(false);
+    }
+  }, [sendChannelState, receiveChannelState])
 
 
   const handleStartChat = async (data) => {
@@ -366,15 +377,20 @@ const gotLocalDescription = (offer) => {
     const readyState = sendChannel.readyState;
     console.log('handleSendChannelStateChange invoked', readyState);
     if (readyState === 'open') {
-      setSendButtonDisabled(false);
+      setSendChannelState(true);
     } else {
-      setSendButtonDisabled(true);
+      ssetSendChannelState(false);
     }
   };
 
   const handleReceiveChannelStateChange = () => {
     const readyState = receiveChannel.readyState;
     console.log('handleReceiveChannelStateChange invoked', readyState);
+    if (readyState === 'open') {
+      setReceiveChannelState(true);
+    } else {
+      setReceiveChannelState(false);
+    }
   };
 
   const sendOnClick = () => {
@@ -405,7 +421,7 @@ const gotLocalDescription = (offer) => {
 
       <div className="chat-container">
         {startChat == "video chat" && <VideoChat/>}
-        {(startChat == "text chat" || startChat == "video chat") && <TextChat sendChannel={sendChannel} receiveChannel={receiveChannel}/>}
+        {(startChat == "text chat" || startChat == "video chat") && <TextChat sendChannel={sendChannel} receiveChannel={receiveChannel} chatting={chatting}/>}
       </div>
 
     </>

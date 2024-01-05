@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
-function TextChat({sendChannel, receiveChannel}) {
+function TextChat({sendChannel, receiveChannel, chatting}) {
+    console.log('chatting', chatting)
     const [log, setLog] = useState([]);
     const [chat, setChat] = useState("");
     const [showStopBtn, setShowStopBtn] = useState(true);
@@ -70,6 +71,10 @@ function TextChat({sendChannel, receiveChannel}) {
       <>
           <div className="text-chat-container">
               <div className="text-log"> 
+                {(!(sendChannel instanceof RTCDataChannel && receiveChannel instanceof RTCDataChannel) && <p> Connecting to server... </p>)}
+                
+                {chatting ?  (<p> You are now chatting with a stranger. Say hi! </p>) : (<p>  Looking for strangers you can chat with. Hang on. </p>)}
+
                 {log.map((chat, index) =>
                   <p key={index} className={chat.sender == "you" ? "chat-you" : "chat-stranger"}>
                     {chat.content}
