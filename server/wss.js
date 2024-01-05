@@ -50,8 +50,9 @@ function onMessage(wss, socket, message) {
     switch (type) {
         case 'join': {
             const interests = body.interests
+            const channelType = body.channelType
 
-            let channelCuid = findChannel(interests);
+            let channelCuid = findChannel(interests, channelType);
             console.log('findchannel result', channelCuid)
             if (channelCuid) {
                 console.log(channelCuid);
@@ -65,6 +66,7 @@ function onMessage(wss, socket, message) {
                 channelCuid = cuid()
                 channels[channelCuid] = {}
                 channels[channelCuid]['users'] = {}
+                channels[channelCuid]['channelType'] = channelType;
                 channels[channelCuid]['users'][userId] = socket;
                 channels[channelCuid]['interests'] = interests;
             }
@@ -161,11 +163,15 @@ function matchInterests(arr1, arr2) {
 }
 
 // Non-null if match
-function findChannel(interests) {
+function findChannel(interests, channelType) {
     // Get all channel cuids
     let channelCuids = Object.keys(channels)
 
     for(var i = 0; i < channelCuids.length; i++) {
+        if (channels[channelCuids[i]]['channelType'] != channelType) {
+            return null;
+        }
+
         let matchedInterests = matchInterests(interests, channels[channelCuids[i]]['interests']);
         if (matchedInterests != []) {
             return channelCuids[i];
@@ -173,20 +179,6 @@ function findChannel(interests) {
       }
 
     return null;
-
-    // let channelCuid = channelCuids.forEach(channelCuid => {
-    //     let matchedInterests = matchInterests(interests, channels[channelCuid]['interests']);
-    //     console.log('matchedInterests', matchedInterests);
-    //     console.log(matchedInterests != [])
-    //     if (matchedInterests != []) {
-    //         return channelCuid;
-    //     }
-    //     else {
-    //         return null;
-    //     }
-    // });
-
-    // return channelCuid;
 }
 
 module.exports = {

@@ -100,14 +100,14 @@ function App() {
   const handleStartTextChat = () => {
     console.log('handleStartTextChat invoked');
     setStartChat("text chat");
-    join();
+    join('text');
     callOnClick();
   }
 
   const handleStartVideoChat = async () => {
     setStartChat("video chat");
     await setupDevice();
-    join();
+    join('video');
     callOnClick();
   }
 
@@ -141,7 +141,7 @@ function App() {
     })
   };
 
-  const join = () => {
+  const join = (channelType) => {
     console.log('join invoked');
     let interests = [''];
 
@@ -150,7 +150,7 @@ function App() {
     // Join a channel
     sendWsMessage('join', {
       userId,
-      channelName,
+      channelType,
       interests,
     });
   };
