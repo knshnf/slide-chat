@@ -43,7 +43,6 @@ function onMessage(wss, socket, message) {
     const parsedMessage = JSON.parse(message)
     const type = parsedMessage.type
     const body = parsedMessage.body
-    const channelName = body.channelName
     const userId = body.userId
     const channelCuid = body.channelCuid
     
@@ -57,8 +56,6 @@ function onMessage(wss, socket, message) {
             if (channelCuid) {
                 console.log(channelCuid);
                 console.log( channels[channelCuid])
-                // channels[channelCuid] = {}
-                // channels[channelCuid]['users'] = {}
                 channels[channelCuid]['users'][userId] = socket;
                 // let newChannelInterests = matchInterests(interests, channel[interests]);
                 channels[channelCuid]['interests'] = interests;
@@ -79,12 +76,19 @@ function onMessage(wss, socket, message) {
         }
         case 'quit': {
             // quit channel
-            if (channels[channelName]) {
-                channels[channelName][userId] = null
-                const userIds = Object.keys(channels[channelName])
-                if (userIds.length === 0) {
-                    delete channels[channelName]
-                }
+            console.log('quit invoked')
+            if (channels[channelCuid]) {
+                const userIds = Object.keys(channels[channelCuid]['users'])
+                
+                userIds.forEach(id => {
+                    const wsClient = channels[channelCuid]['users'][id]
+                    if (userId.toString() !== id.toString()) {
+                        send(wsClient, 'quit')
+                    }
+                })
+                delete channels[channelCuid]
+                console.log('user quit channel', userId)
+                console.log('channels', channels)
             }
             break;
         }
@@ -168,14 +172,20 @@ function findChannel(interests, channelType) {
     let channelCuids = Object.keys(channels)
 
     for(var i = 0; i < channelCuids.length; i++) {
+        // Get number of users in channel
+        let userIds = Object.keys(channels[channelCuids[i]]['users'])
+
         if (channels[channelCuids[i]]['channelType'] != channelType) {
             return null;
         }
 
-        let matchedInterests = matchInterests(interests, channels[channelCuids[i]]['interests']);
-        if (matchedInterests != []) {
-            return channelCuids[i];
+        if(userIds.length < 2 ) {
+            let matchedInterests = matchInterests(interests, channels[channelCuids[i]]['interests']);
+            if (matchedInterests != []) {
+                return channelCuids[i];
+            }
         }
+        
       }
 
     return null;

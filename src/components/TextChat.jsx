@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-function TextChat({sendChannel, receiveChannel, chatting}) {
+function TextChat({sendChannel, receiveChannel, chatting, strangerDisconnected}) {
     console.log('chatting', chatting)
     const [log, setLog] = useState([]);
     const [chat, setChat] = useState("");
@@ -80,6 +80,8 @@ function TextChat({sendChannel, receiveChannel, chatting}) {
                     {chat.content}
                   </p>
                 )}
+
+              {strangerDisconnected && <p>  Stranger has disconnected. </p>}
               </div>
               <div className="text-chat-actions"> 
                 {showStopBtn && <button className="stop-btn" onClick={handleStopBtn}> Stop <br /> (Esc)</button>}

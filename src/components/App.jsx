@@ -24,22 +24,13 @@ const pcConstraints = {
 
 function App() {
   // STATES
-  // Temporary values
-  const [startButtonDisabled, setStartButtonDisabled] = useState(true);
-  const [joinButtonDisabled, setJoinButtonDisabled] = useState(true);
-  const [callButtonDisabled, setCallButtonDisabled] = useState(true);
-  const [hangupButtonDisabled, setHangupButtonDisabled] = useState(true);
-  const [sendButtonDisabled, setSendButtonDisabled] = useState(true);
   const [sendMessage, setSendMessage] = useState('');
-  const [receiveMessage, setReceiveMessage] = useState('');
-  const [channelName, setChannelName] = useState('TEST');
   const [userId, setUserId] = useState(Math.floor(Math.random() * 1000000));
-  const [renderLocalStream, setRenderLocalStream] = useState(false);
   const [sendChannelState, setSendChannelState] = useState(false);
   const [receiveChannelState, setReceiveChannelState] = useState(false);
   const [chatting, setChatting] = useState(false);
-
   const [startChat, setStartChat] = useState("none");
+  const [strangerDisconnected, setstrangerDisconnected] = useState(false); 
 
   // Reference for web socket
   const ws = useRef(null);
@@ -86,22 +77,24 @@ function App() {
           }
         case 'quit':
           {
+            channelCuid = null;
+            setstrangerDisconnected(true);
             break;
           }
         default:
           break;
       }
     };
-  }, [channelName, userId]);
+  }, [channelCuid, userId]);
 
   useEffect(() => {
-    if(sendChannelState && receiveChannelState) {
+    if(sendChannelState && receiveChannelState && channelCuid != null) {
       setChatting(true);
     }
     else {
       setChatting(false);
     }
-  }, [sendChannelState, receiveChannelState])
+  }, [sendChannelState, receiveChannelState, channelCuid])
 
 
   const handleStartChat = async (data) => {
@@ -156,8 +149,7 @@ function App() {
     console.log('join invoked');
     let interests = [''];
 
-    setJoinButtonDisabled(true);
-    setCallButtonDisabled(false);
+    setstrangerDisconnected(false); 
     // Join a channel
     sendWsMessage('join', {
       userId,
@@ -170,9 +162,6 @@ function App() {
   // Send an offer
   const callOnClick = () => {
     console.log('callOnClick invoked');
-
-    setCallButtonDisabled(true);
-    setHangupButtonDisabled(false);
 
     console.log('localstream on callonclick', localStream);
 
@@ -212,8 +201,6 @@ function App() {
   // This function will run if this client was sent an offer. Sends an answer.
   const onAnswer = (offer) => {
     console.log('onAnswer invoked');
-    setCallButtonDisabled(true);
-    setHangupButtonDisabled(false);
 
     if (localStream && localStream.getVideoTracks().length > 0) {
       console.log(`Using video device: ${localStream.getVideoTracks()[0].label}`);
@@ -271,7 +258,6 @@ const closeDataChannel = () => {
   console.log('closeDataChannel invoked');
   sendChannel && sendChannel.close();
   receiveChannel && receiveChannel.close();
-  setSendButtonDisabled(true);
 };
 
 const gotLocalDescription = (offer) => {
@@ -309,18 +295,6 @@ const gotLocalDescription = (offer) => {
   const gotLocalIceCandidateOffer = (event) => {
     console.log('gotLocalIceCandidateOffer invoked', event.candidate, localPeerConnection.localDescription);
 
-    if (!channelName) {
-      log.error('channelName is empty');
-      alert('channelName is empty');
-      return;
-    }
-
-    if (!userId) {
-      log.error('userId is empty');
-      alert('userId is empty');
-      return;
-    }
-
     // gathering candidate finished, send complete sdp
     if (!event.candidate) {
       const offer = localPeerConnection.localDescription;
@@ -335,18 +309,6 @@ const gotLocalDescription = (offer) => {
   // Answer to an offer
   const gotLocalIceCandidateAnswer = (event) => {
     console.log('gotLocalIceCandidateAnswer invoked', event.candidate, localPeerConnection.localDescription);
-
-    if (!channelName) {
-      log.error('channelName is empty');
-      alert('channelName is empty');
-      return;
-    }
-
-    if (!userId) {
-      log.error('userId is empty');
-      alert('userId is empty');
-      return;
-    }
 
     // gathering candidate finished, send complete sdp
     if (!event.candidate) {
@@ -390,6 +352,17 @@ const gotLocalDescription = (offer) => {
       setReceiveChannelState(true);
     } else {
       setReceiveChannelState(false);
+
+      // Handle if peer quit
+      if (channelCuid) {
+        sendWsMessage('quit', {
+          userId,
+          channelCuid,
+        });
+
+        channelCuid = null;
+        setstrangerDisconnected(true);
+      }
     }
   };
 
@@ -406,11 +379,21 @@ const gotLocalDescription = (offer) => {
   };
 
   const handleCloseChat = () => {
-    localStream.getTracks().forEach(function(track) {
-      track.stop();
-    });
+    console.log('handleCloseChat invoked')
 
-    // TODO: Close Connections
+    // localStream.getTracks().forEach(function(track) {
+    //   track.stop();
+    // });
+
+    console.log('sending quit message')
+    sendWsMessage('quit', {
+      userId,
+      channelCuid,
+    });
+    
+    channelCuid = null;
+
+    closeDataChannel();
     
   }
 
@@ -421,7 +404,8 @@ const gotLocalDescription = (offer) => {
 
       <div className="chat-container">
         {startChat == "video chat" && <VideoChat/>}
-        {(startChat == "text chat" || startChat == "video chat") && <TextChat sendChannel={sendChannel} receiveChannel={receiveChannel} chatting={chatting}/>}
+        {(startChat == "text chat" || startChat == "video chat") && 
+        <TextChat sendChannel={sendChannel} receiveChannel={receiveChannel} chatting={chatting} strangerDisconnected={strangerDisconnected}/>}
       </div>
 
     </>
