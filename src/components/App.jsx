@@ -29,6 +29,7 @@ function App() {
   const [sendChannelState, setSendChannelState] = useState(false);
   const [receiveChannelState, setReceiveChannelState] = useState(false);
   const [chatting, setChatting] = useState(false);
+  const [looking, setlooking] = useState(false);
   const [startChat, setStartChat] = useState("none");
   const [strangerDisconnected, setstrangerDisconnected] = useState(false); 
 
@@ -59,6 +60,7 @@ function App() {
             const body = parsedMessage.body;
             channelCuid = body[1]
             console.log('interests of this channel', body);
+            setlooking(true);
             break;
           }
         // Receive an offer
@@ -90,6 +92,7 @@ function App() {
   useEffect(() => {
     if(sendChannelState && receiveChannelState && channelCuid != null) {
       setChatting(true);
+      setlooking(false);
     }
     else {
       setChatting(false);
@@ -394,6 +397,8 @@ const gotLocalDescription = (offer) => {
     channelCuid = null;
 
     closeDataChannel();
+
+    setlooking(false);
     
   }
 
@@ -405,7 +410,9 @@ const gotLocalDescription = (offer) => {
       <div className="chat-container">
         {startChat == "video chat" && <VideoChat/>}
         {(startChat == "text chat" || startChat == "video chat") && 
-        <TextChat sendChannel={sendChannel} receiveChannel={receiveChannel} chatting={chatting} strangerDisconnected={strangerDisconnected}/>}
+        <TextChat sendChannel={sendChannel} receiveChannel={receiveChannel} chatting={chatting} looking={looking}
+        strangerDisconnected={strangerDisconnected} handleCloseChat={handleCloseChat} handleStartTextChat={handleStartTextChat} handleStartVideoChat={handleStartVideoChat}
+        startChat={startChat}/>}
       </div>
 
     </>

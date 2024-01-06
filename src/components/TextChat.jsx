@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 
-function TextChat({sendChannel, receiveChannel, chatting, strangerDisconnected}) {
-    console.log('chatting', chatting)
+function TextChat({sendChannel, receiveChannel, chatting, looking, strangerDisconnected, handleCloseChat, handleStartTextChat, handleStartVideoChat, startChat}) {
     const [log, setLog] = useState([]);
     const [chat, setChat] = useState("");
     const [showStopBtn, setShowStopBtn] = useState(true);
     const [showConfirmBtn, setShowConfirmBtn] = useState(false);
     const [showNextBtn, setShowNextBtn] = useState(false);
+    const [youDisconnected, setYouDisconnected] = useState(false);
 
     // Event handler for receiving message
     if(receiveChannel instanceof RTCDataChannel) {
@@ -45,11 +45,26 @@ function TextChat({sendChannel, receiveChannel, chatting, strangerDisconnected})
     const handleConfirmBtn = () => {
       setShowConfirmBtn(false);
       setShowNextBtn(true);
+      handleCloseChat();
+      
+      if(!looking) {
+        setYouDisconnected(true);
+      }
     }
 
     const handleNextBtn = () => {
       setShowNextBtn(false);
       setShowStopBtn(true); 
+      setYouDisconnected(false);
+      setLog([]);
+      console.log(startChat);
+      if(startChat === "video chat") {
+        handleStartVideoChat();
+      }
+      else if(startChat === "text chat") {
+        handleStartTextChat();
+      }
+      
     }
 
     const handleOnEnter = (e) => {
@@ -58,6 +73,14 @@ function TextChat({sendChannel, receiveChannel, chatting, strangerDisconnected})
         handleSend();
       }
     }
+
+    useEffect(() => {
+      if(strangerDisconnected) {
+        setShowStopBtn(false); 
+        setShowConfirmBtn(false);
+        setShowNextBtn(true);
+      }
+    }, [strangerDisconnected])
 
     // const handleOnEsc = (e) => {
     //   console.log('keyboard event invoked', buttonShown);
@@ -71,9 +94,10 @@ function TextChat({sendChannel, receiveChannel, chatting, strangerDisconnected})
       <>
           <div className="text-chat-container">
               <div className="text-log"> 
-                {(!(sendChannel instanceof RTCDataChannel && receiveChannel instanceof RTCDataChannel) && <p> Connecting to server... </p>)}
-                
-                {chatting ?  (<p> You are now chatting with a stranger. Say hi! </p>) : (<p>  Looking for strangers you can chat with. Hang on. </p>)}
+                {(!(sendChannel instanceof RTCDataChannel) && <p> Connecting to server... </p>)}
+                {!looking && !chatting && !strangerDisconnected && !youDisconnected && (<p> Start a conversation by clicking on the 'Next' button. </p>)}
+                {chatting &&  (<p> You are now chatting with a stranger. Say hi! </p>)}
+                {looking && (<p>  Looking for strangers you can chat with. Hang on. </p>)}
 
                 {log.map((chat, index) =>
                   <p key={index} className={chat.sender == "you" ? "chat-you" : "chat-stranger"}>
@@ -82,6 +106,7 @@ function TextChat({sendChannel, receiveChannel, chatting, strangerDisconnected})
                 )}
 
               {strangerDisconnected && <p>  Stranger has disconnected. </p>}
+              {youDisconnected && <p>  You have disconnected. </p>}
               </div>
               <div className="text-chat-actions"> 
                 {showStopBtn && <button className="stop-btn" onClick={handleStopBtn}> Stop <br /> (Esc)</button>}
