@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import Interest from './Interest.jsx'
 
-function Landing({handleStartTextChat, handleStartVideoChat}) {
-  const [interests, setInterests] = useState([]);
-  const [interest, setInterest] = useState("");
+function Landing({interest, interests, setInterest, setInterests, handleStartTextChat, handleStartVideoChat}) {
 
   const handleOnEnter = (e) => {
     if(e.keyCode == 13 && e.shiftKey == false) {
@@ -34,8 +32,8 @@ function Landing({handleStartTextChat, handleStartVideoChat}) {
       <div className="landing-container">
         <h2 className="chat-label"> Start Chatting </h2>
         <div className="chat-btns">
-          <button type="button" onClick={() => handleStartTextChat()}> Text </button>
-          <button onClick={() => handleStartVideoChat()}> Video </button>
+          <button type="button" onClick={() => handleStartTextChat(interests)}> Text </button>
+          <button onClick={() => handleStartVideoChat(interests)}> Video </button>
         </div>
         <h2 className="chat-label"> What do you wanna talk about? </h2>
         <div className="interests-container">

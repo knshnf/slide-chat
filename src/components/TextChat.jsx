@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-function TextChat({sendChannel, receiveChannel, chatting, looking, strangerDisconnected, handleCloseChat, handleStartTextChat, handleStartVideoChat, startChat}) {
+function TextChat({sendChannel, receiveChannel, chatting, looking, strangerDisconnected, handleCloseChat, handleStartTextChat, handleStartVideoChat, startChat, channelInterests}) {
     const [log, setLog] = useState([]);
     const [chat, setChat] = useState("");
     const [showStopBtn, setShowStopBtn] = useState(true);
@@ -98,6 +98,7 @@ function TextChat({sendChannel, receiveChannel, chatting, looking, strangerDisco
                 {!looking && !chatting && !strangerDisconnected && !youDisconnected && (<p> Start a conversation by clicking on the 'Next' button. </p>)}
                 {chatting &&  (<p> You are now chatting with a stranger. Say hi! </p>)}
                 {looking && (<p>  Looking for strangers you can chat with. Hang on. </p>)}
+                {!looking && channelInterests.length > 0 && (<p>  You both like {channelInterests.join(", ")}. </p>)}
 
                 {log.map((chat, index) =>
                   <p key={index} className={chat.sender == "you" ? "chat-you" : "chat-stranger"}>

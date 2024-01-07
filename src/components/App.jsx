@@ -31,7 +31,10 @@ function App() {
   const [chatting, setChatting] = useState(false);
   const [looking, setlooking] = useState(false);
   const [startChat, setStartChat] = useState("none");
-  const [strangerDisconnected, setstrangerDisconnected] = useState(false); 
+  const [strangerDisconnected, setstrangerDisconnected] = useState(false);
+  const [interests, setInterests] = useState([]);
+  const [interest, setInterest] = useState("");
+  const [channelInterests, setChannelInterests] = useState([]);
 
   // Reference for web socket
   const ws = useRef(null);
@@ -59,15 +62,17 @@ function App() {
           {
             const body = parsedMessage.body;
             channelCuid = body[1]
-            console.log('interests of this channel', body);
+            console.log('interests of this channel', body[0]);
             setlooking(true);
+            setChannelInterests(body[0]);
             break;
           }
         // Receive an offer
         case 'offer_sdp_received':
           {
             console.log('offer_sdp_received');
-            const offer = parsedMessage.body;
+            const offer = parsedMessage.body.sdp;
+            setChannelInterests(parsedMessage.body.interests);
             onAnswer(offer);
             break;
           }
@@ -81,6 +86,7 @@ function App() {
           {
             channelCuid = null;
             setstrangerDisconnected(true);
+            setChannelInterests([]);
             break;
           }
         default:
@@ -150,9 +156,8 @@ function App() {
 
   const join = (channelType) => {
     console.log('join invoked');
-    let interests = [''];
 
-    setstrangerDisconnected(false); 
+    setstrangerDisconnected(false);
     // Join a channel
     sendWsMessage('join', {
       userId,
@@ -399,20 +404,19 @@ const gotLocalDescription = (offer) => {
     closeDataChannel();
 
     setlooking(false);
-    
   }
 
   return (
     <>
       <Navbar handleStartChat={handleStartChat} handleCloseChat={handleCloseChat}/>
-      {startChat == "none" && <Landing handleStartTextChat={handleStartTextChat} handleStartVideoChat={handleStartVideoChat}/>}
+      {startChat == "none" && <Landing interest={interest} interests={interests} setInterest={setInterest} setInterests={setInterests} handleStartTextChat={handleStartTextChat} handleStartVideoChat={handleStartVideoChat}/>}
 
       <div className="chat-container">
         {startChat == "video chat" && <VideoChat/>}
         {(startChat == "text chat" || startChat == "video chat") && 
         <TextChat sendChannel={sendChannel} receiveChannel={receiveChannel} chatting={chatting} looking={looking}
         strangerDisconnected={strangerDisconnected} handleCloseChat={handleCloseChat} handleStartTextChat={handleStartTextChat} handleStartVideoChat={handleStartVideoChat}
-        startChat={startChat}/>}
+        startChat={startChat} channelInterests={channelInterests}/>}
       </div>
 
     </>

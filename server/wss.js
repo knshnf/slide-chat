@@ -50,15 +50,19 @@ function onMessage(wss, socket, message) {
         case 'join': {
             const interests = body.interests
             const channelType = body.channelType
+            interests.map(interest=>{ return interest.toUpperCase(); });
 
-            let channelCuid = findChannel(interests, channelType);
-            console.log('findchannel result', channelCuid)
-            if (channelCuid) {
+            let findChannelResults = findChannel(interests, channelType);
+            let channelCuid = null;
+            console.log('findchannel result', findChannelResults)
+            if (findChannelResults) {
+                channelCuid = findChannelResults.channelCuid
+
                 console.log(channelCuid);
                 console.log( channels[channelCuid])
                 channels[channelCuid]['users'][userId] = socket;
                 // let newChannelInterests = matchInterests(interests, channel[interests]);
-                channels[channelCuid]['interests'] = interests;
+                channels[channelCuid]['interests'] = findChannelResults.matchedInterests;
             } else {
                 channelCuid = cuid()
                 channels[channelCuid] = {}
@@ -97,11 +101,13 @@ function onMessage(wss, socket, message) {
             const sdp = body.sdp;
             let userIds = Object.keys(channels[channelCuid]['users']);
             console.log('userids to send offer', userIds);
+
+            const interests = channels[channelCuid]['interests']
             userIds.forEach(id => {
                 if (userId.toString() !== id.toString()) {
                     console.log('offer sent');
                     const wsClient = channels[channelCuid]['users'][id]
-                    send(wsClient, 'offer_sdp_received', sdp)
+                    send(wsClient, 'offer_sdp_received', {sdp, interests})
                 }
             })
             break;
@@ -172,6 +178,8 @@ function findChannel(interests, channelType) {
     let channelCuids = Object.keys(channels)
 
     for(var i = 0; i < channelCuids.length; i++) {
+        const channelCuid = channelCuids[i];
+
         // Get number of users in channel
         let userIds = Object.keys(channels[channelCuids[i]]['users'])
 
@@ -180,9 +188,15 @@ function findChannel(interests, channelType) {
         }
 
         if(userIds.length < 2 ) {
+            if (interests.length === 0 && channels[channelCuids[i]]['interests'].length === 0) {
+                let matchedInterests = []
+                return {channelCuid, matchedInterests};
+            }
+
             let matchedInterests = matchInterests(interests, channels[channelCuids[i]]['interests']);
-            if (matchedInterests != []) {
-                return channelCuids[i];
+        
+            if (matchedInterests.length > 0) {
+                return {channelCuid, matchedInterests};
             }
         }
         
