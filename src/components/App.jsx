@@ -3,7 +3,7 @@ import Landing from './Landing.jsx'
 import TextChat from './TextChat.jsx'
 import VideoChat from './VideoChat.jsx'
 import React, { useState, useEffect, useRef } from "react";
-
+import cuid from 'cuid';
 
 let localStream;
 let remoteStream;
@@ -25,7 +25,7 @@ const pcConstraints = {
 function App() {
   // STATES
   const [sendMessage, setSendMessage] = useState('');
-  const [userId, setUserId] = useState(Math.floor(Math.random() * 1000000));
+  const [userId, setUserId] = useState(cuid());
   const [sendChannelState, setSendChannelState] = useState(false);
   const [receiveChannelState, setReceiveChannelState] = useState(false);
   const [chatting, setChatting] = useState(false);
