@@ -94,6 +94,54 @@ nav a {
   height: calc(100% - 95px);
 }
 
+/* Interests */
+.interests-container {
+  width: 100%;
+  height: 50px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  padding: 20px 10px 15px 10px;
+  gap: 10px;
+}
+
+.interests-field {
+  border: 0;
+  width: 100%;
+  outline: none;
+  display: flex;
+  flex-direction: row;
+  font-size: large;
+}
+
+.interests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  height: fit-content;
+}
+
+.interest {
+  width: fit-content;
+  border: 0;
+  outline: none;
+  background: #fb8b24;
+  padding: 3px 5px 3px 5px;
+  border-radius: 5px;
+  color: white;
+}
+
+.remove-interest-btn {
+  background-color: transparent; 
+  border: 0;
+  display: inline-block;
+  vertical-align: bottom;
+  cursor: pointer;
+}
+
 /* Text Chat */
 .text-chat-container {
   display: flex;
