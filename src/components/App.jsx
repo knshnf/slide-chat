@@ -383,10 +383,6 @@ const gotLocalDescription = (offer) => {
   const handleCloseChat = () => {
     console.log('handleCloseChat invoked')
 
-    // localStream.getTracks().forEach(function(track) {
-    //   track.stop();
-    // });
-
     console.log('sending quit message')
     sendWsMessage('quit', {
       userId,
@@ -399,6 +395,11 @@ const gotLocalDescription = (offer) => {
 
     setlooking(false);
   }
+
+  window.addEventListener("beforeunload", (ev) => 
+  { 
+      handleCloseChat();
+  });
 
   return (
     <>
