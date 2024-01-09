@@ -137,22 +137,16 @@ function App() {
     };
 
   const setupDevice = async () => {
-    return new Promise((resolve, reject) => {
       console.log('setupDevice invoked');
-      navigator.getUserMedia({ audio: true, video: true }, (stream) => {
-        // render local stream on DOM
-        const localPlayer = document.getElementById('local-player');
-        localPlayer.srcObject = stream;
-        
-        localStream = stream;
-        console.log('assigned value to localStream', localStream);
-        resolve();
-      }, (error) => {
-        console.error('getUserMedia error:', error);
-        reject();
-      });
-    })
-  };
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+      
+      // render local stream on DOM
+      const localPlayer = document.getElementById('local-player');
+
+      localPlayer.srcObject = stream;
+      localStream = stream;
+    }
+
 
   const join = (channelType) => {
     console.log('join invoked');
