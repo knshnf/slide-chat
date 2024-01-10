@@ -114,6 +114,11 @@ function App() {
     }
   }, [sendChannelState, receiveChannelState, channelCuid])
 
+  useEffect(() => {
+    if(localStream && startChat === "none") {
+      localStream.getTracks().forEach(track => track.stop())
+    }
+  }, [startChat])
 
   const handleStartChat = async (data) => {
     setStartChat(data);
