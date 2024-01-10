@@ -87,6 +87,15 @@ function App() {
             channelCuid = null;
             setstrangerDisconnected(true);
             setChannelInterests([]);
+            if(startChat === "video chat") {
+              const remotePlayer = document.getElementById('peer-player');
+              remotePlayer.srcObject = null;
+            }
+            
+            channelCuid = null;
+        
+            closeDataChannel();
+
             break;
           }
         default:
@@ -388,6 +397,11 @@ const gotLocalDescription = (offer) => {
       userId,
       channelCuid,
     });
+
+    if(startChat === "video chat") {
+      const remotePlayer = document.getElementById('peer-player');
+      remotePlayer.srcObject = null;
+    }
     
     channelCuid = null;
 
