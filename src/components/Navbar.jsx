@@ -5,8 +5,8 @@ function Navbar({handleStartChat, handleCloseChat}) {
     <>
       <nav>
         <a onClick={() => {handleStartChat("none"); handleCloseChat();}}>
-          <img src={slideLogo} className="logo"></img>
-          <span className="title">slide</span>
+          <img src={slideLogo}/> 
+          <span className="title"> slide </span>
         </a>
       </nav>
     </>
