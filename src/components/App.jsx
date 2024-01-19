@@ -424,15 +424,15 @@ const gotLocalDescription = (offer) => {
     <>
       <Navbar handleStartChat={handleStartChat} handleCloseChat={handleCloseChat}/>
       {startChat == "none" && <Landing interest={interest} interests={interests} setInterest={setInterest} setInterests={setInterests} handleStartTextChat={handleStartTextChat} handleStartVideoChat={handleStartVideoChat}/>}
-
+      
+      {(startChat == "text chat" || startChat == "video chat") &&
       <div className="chat-container">
         {startChat == "video chat" && <VideoChat/>}
-        {(startChat == "text chat" || startChat == "video chat") && 
         <TextChat sendChannel={sendChannel} receiveChannel={receiveChannel} chatting={chatting} looking={looking}
         strangerDisconnected={strangerDisconnected} handleCloseChat={handleCloseChat} handleStartTextChat={handleStartTextChat} handleStartVideoChat={handleStartVideoChat}
-        startChat={startChat} channelInterests={channelInterests}/>}
-      </div>
-
+        startChat={startChat} channelInterests={channelInterests}/>
+      </div>}
+      
     </>
   )
 }

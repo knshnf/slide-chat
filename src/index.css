@@ -58,40 +58,11 @@ nav a {
 }
 
 /* Landing */
-
-.landing-container {
-  margin: 0 30%;
-}
-
-.chat-btns {
-  width: 100%;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  gap: 50px;
-}
-
 .chat-label {
   font-weight: normal;
   font-size: 30px;
 }
 
-.chat-btns button {
-  height: 45px;
-  width: 120px;
-  padding: 15px 20px;
-  background-color: #fb8b24;
-  border-color: #fb8b24;;
-  color: white;
-  border: 0;
-  border-radius: 7px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.chat-btns button:active {
-  background-color: #e36414;
-}
 
 .chat-container {
   display: flex;
@@ -101,8 +72,8 @@ nav a {
 
 /* Interests */
 .interests-container {
-  width: 100%;
-  height: 50px;
+  width: 60%;
+  height: auto;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -115,7 +86,6 @@ nav a {
 
 .interests-field {
   border: 0;
-  width: 100%;
   outline: none;
   display: flex;
   flex-direction: row;
