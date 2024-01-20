@@ -67,7 +67,7 @@ nav a {
 .chat-container {
   display: flex;
   flex-direction: row;
-  height: calc(100% - 95px);
+  height: calc(100% - 70px);
 }
 
 /* Interests */
