@@ -107,13 +107,14 @@ nav a {
   padding: 3px 5px 3px 5px;
   border-radius: 5px;
   color: white;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .remove-interest-btn {
   background-color: transparent; 
   border: 0;
-  display: inline-block;
-  vertical-align: bottom;
+  vertical-align: middle;
   cursor: pointer;
 }
 
